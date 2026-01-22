@@ -1,0 +1,9 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: nagabuti13
+      POSTGRES_PASSWORD: onfivthr13
+      POSTGRES_DB: industry_ai
+    ports:
+      - "5432:5432"
