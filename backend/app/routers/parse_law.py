@@ -1,21 +1,26 @@
 import re
 from typing import List, Dict
 
-CHAPTER_RE = re.compile(r"(제\s*(\d+)\s*장)\s*([^\n]*)")
-ARTICLE_RE = re.compile(r"(제\s*(\d+)\s*조)\s*(\([^)]+\))?")
+# '장'을 구분
+CHAPTER_RE = re.compile(r"(?m)^\s*(제(\d+)장)\s*([^\n]*)")
+# '조(의)'를 구분
+ARTICLE_RE = re.compile(
+    r"(?m)^(제(\d+)조(?:의\d+)?)(?!\s*제)(\([^)]+\))?"
+)
 
+# pdf의 메타 데이터를 일정한 규칙으로 정리
 def normalize(text: str) -> str:
     text = text.replace("\u00a0", " ")
     text = re.sub(r"[ \t]+", " ", text)
-    text = re.sub(r"\n{3,}", "\n\n", text)
     return text.strip()
 
-def split_to_articles(full_text: str) -> List[Dict]:
+def split_to_articles(full_text):
     full_text = normalize(full_text)
-
+    # 장 탐색
     chapters = []
     for m in CHAPTER_RE.finditer(full_text):
         chapters.append({
+            # 절대적 인덱스 위치
             "start": m.start(),
             "end": m.end(),
             "chapter_no": int(m.group(2)),
@@ -28,7 +33,7 @@ def split_to_articles(full_text: str) -> List[Dict]:
             "chapter_no": None, "chapter_title": None,
         }]
 
-    results: List[Dict] = []
+    results = []
 
     for i, ch in enumerate(chapters):
         seg_start = ch["end"]
@@ -36,7 +41,7 @@ def split_to_articles(full_text: str) -> List[Dict]:
         seg = full_text[seg_start:seg_end].strip()
         if not seg:
             continue
-
+        # 장 아래의 조 탐색
         matches = list(ARTICLE_RE.finditer(seg))
         for j, am in enumerate(matches):
             a_start = am.start()

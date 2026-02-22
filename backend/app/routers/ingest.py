@@ -14,8 +14,6 @@ def ingest_pdf(pdf_path: str, title: str):
     full_text = normalize(raw)
     articles = split_to_articles(full_text)
 
-
-
     from collections import Counter
     cnt = Counter([a["article_no"] for a in articles])
     dups = [k for k,v in cnt.items() if v > 1]
@@ -29,7 +27,9 @@ def ingest_pdf(pdf_path: str, title: str):
 
     with SessionLocal() as db:
         doc = LawDocument(title=title, source_pdf=os.path.basename(pdf_path))
+        # add: 변경사항 가져오기
         db.add(doc)
+        # DB에 SQL 수행(롤백 가능) != db.commit()
         db.flush()
 
         for a in articles:
