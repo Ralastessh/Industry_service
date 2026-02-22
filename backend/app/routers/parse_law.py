@@ -5,8 +5,7 @@ from typing import List, Dict
 CHAPTER_RE = re.compile(r"(?m)^\s*(제(\d+)장)\s*([^\n]*)")
 # '조(의)'를 구분
 ARTICLE_RE = re.compile(
-    r"(?m)^(제(\d+)조(?:의\d+)?)(?!\s*제)(\([^)]+\))?"
-)
+    r"(?m)^(제(\d+)조(?:의(\d+))?)(?!\s*제)(\([^)]+\))?")
 
 # pdf의 메타 데이터를 일정한 규칙으로 정리
 def normalize(text: str) -> str:
@@ -47,16 +46,18 @@ def split_to_articles(full_text):
             a_start = am.start()
             a_end = matches[j+1].start() if j+1 < len(matches) else len(seg)
 
-            article_no = int(am.group(2))
-            article_title = (am.group(3) or "").strip()
+            main_article_no = int(am.group(2))
+            sub_article_no = int(am.group(3)) if am.group(3) else 0
+            article_title = (am.group(4) or "").strip()
             article_block = seg[a_start:a_end].strip()
-
-            results.append({
-                "chapter_no": ch["chapter_no"],
-                "chapter_title": ch["chapter_title"],
-                "article_no": article_no,
-                "article_title": article_title.strip("()") if article_title else None,
-                "text": article_block,
-            })
+            if article_title:
+                results.append({
+                    "chapter_no": ch["chapter_no"],
+                    "chapter_title": ch["chapter_title"],
+                    "main_article_no": main_article_no,
+                    'sub_article_no': sub_article_no,
+                    "article_title": article_title.strip("()") if article_title else None,
+                    "text": article_block,
+                })
 
     return results

@@ -3,7 +3,7 @@ from sqlalchemy import String, Text, Integer, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from pgvector.sqlalchemy import Vector
 
-EMBED_DIM = 3072  # text-embedding-3-large 차원
+EMBED_DIM = 1536  # text-embedding-3-small 차원
 
 # Base 부모 클래스 선언
 class Base(DeclarativeBase):
@@ -28,14 +28,15 @@ class LawArticle(Base):
     chapter_no: Mapped[int | None] = mapped_column(Integer, nullable=True)
     chapter_title: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
-    article_no: Mapped[int] = mapped_column(Integer)
+    main_article_no: Mapped[int] = mapped_column(Integer)
+    sub_article_no: Mapped[int] = mapped_column(Integer)
     article_title: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     text: Mapped[str] = mapped_column(Text)
     chunks: Mapped[list["LawChunk"]] = relationship(back_populates="article", cascade="all, delete-orphan")
 
     __table_args__ = (
-        UniqueConstraint("doc_id", "article_no", name="uq_doc_article"),
+        UniqueConstraint("doc_id", "main_article_no", "sub_article_no", name="uq_doc_article"),
     )
 
 class LawChunk(Base):

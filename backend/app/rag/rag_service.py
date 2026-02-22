@@ -1,6 +1,6 @@
 
 from sqlalchemy.orm import Session
-import backend.app.db.models as models
+import backend.app.db.tables as tables
 from pgvector.sqlalchemy import Vector
 
 async def process_analysis(db: Session, request):

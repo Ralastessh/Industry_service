@@ -2,7 +2,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-import backend.app.db.models as models, backend.app.db.init_db as init_db, backend.app.services.rag_service as rag_service
+import backend.app.db.tables as tables, backend.app.db.init_db as init_db, backend.app.services.rag_service as rag_service
 from pydantic import BaseModel
 from typing import List, Optional
 
@@ -18,7 +18,7 @@ app.add_middleware(
 )
 
 # 데이터베이스 초기화 (실제 운영 시에는 Alembic 권장)
-models.Base.metadata.create_all(bind=init_db.engine)
+tables.Base.metadata.create_all(bind=init_db.engine)
 
 class ScenarioRequest(BaseModel):
     work_type: str
