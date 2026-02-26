@@ -6,10 +6,10 @@ SQLAlchemy==2.0.34
 psycopg2-binary==2.9.9
 pgvector==0.3.6
 
-langchain==0.1.20
-langchain-community==0.0.38
-langchain-text-splitters==0.0.1
-langchain_openai==1.1.7
+langchain
+langchain-community
+langchain-text-splitters
+langchain-openai
 
 pydantic
 pypdf==4.3.1
